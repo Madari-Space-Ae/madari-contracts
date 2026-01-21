@@ -27,17 +27,10 @@ contract BucketRegistry {
     mapping(address => mapping(string => bytes32)) public bucketByName;
 
     event BucketCreated(
-        bytes32 indexed bucketId,
-        address indexed owner,
-        string name,
-        uint256 timestamp
+        bytes32 indexed bucketId, address indexed owner, string name, uint256 timestamp
     );
 
-    event BucketDeleted(
-        bytes32 indexed bucketId,
-        address indexed owner,
-        uint256 timestamp
-    );
+    event BucketDeleted(bytes32 indexed bucketId, address indexed owner, uint256 timestamp);
 
     /**
      * @notice Create a new bucket
@@ -48,18 +41,16 @@ contract BucketRegistry {
     function createBucket(
         string calldata name,
         bytes32 encryptionKeyHash
-    ) external returns (bytes32 bucketId) {
+    )
+        external
+        returns (bytes32 bucketId)
+    {
         require(bytes(name).length > 0, "Name required");
         require(bytes(name).length <= 63, "Name too long");
-        require(
-            bucketByName[msg.sender][name] == bytes32(0),
-            "Name already exists"
-        );
+        require(bucketByName[msg.sender][name] == bytes32(0), "Name already exists");
 
         // Generate unique bucket ID
-        bucketId = keccak256(
-            abi.encodePacked(msg.sender, name, block.timestamp, block.number)
-        );
+        bucketId = keccak256(abi.encodePacked(msg.sender, name, block.timestamp, block.number));
 
         buckets[bucketId] = Bucket({
             bucketId: bucketId,
@@ -100,9 +91,7 @@ contract BucketRegistry {
         return buckets[bucketId];
     }
 
-    function listBuckets(
-        address owner
-    ) external view returns (bytes32[] memory) {
+    function listBuckets(address owner) external view returns (bytes32[] memory) {
         return userBuckets[owner];
     }
 
@@ -114,10 +103,7 @@ contract BucketRegistry {
         return buckets[bucketId].owner;
     }
 
-    function getBucketByName(
-        address owner,
-        string calldata name
-    ) external view returns (bytes32) {
+    function getBucketByName(address owner, string calldata name) external view returns (bytes32) {
         return bucketByName[owner][name];
     }
 }

@@ -14,18 +14,9 @@ contract PublicKeyRegistry {
     // Track registration timestamps
     mapping(address => uint256) public registeredAt;
 
-    event PublicKeyRegistered(
-        address indexed user,
-        bytes publicKey,
-        uint256 timestamp
-    );
+    event PublicKeyRegistered(address indexed user, bytes publicKey, uint256 timestamp);
 
-    event PublicKeyUpdated(
-        address indexed user,
-        bytes oldKey,
-        bytes newKey,
-        uint256 timestamp
-    );
+    event PublicKeyUpdated(address indexed user, bytes oldKey, bytes newKey, uint256 timestamp);
 
     /**
      * @notice Register your public key for receiving encrypted keys
@@ -39,12 +30,7 @@ contract PublicKeyRegistry {
         bytes memory oldKey = publicKeys[msg.sender];
 
         if (oldKey.length > 0) {
-            emit PublicKeyUpdated(
-                msg.sender,
-                oldKey,
-                publicKey,
-                block.timestamp
-            );
+            emit PublicKeyUpdated(msg.sender, oldKey, publicKey, block.timestamp);
         } else {
             emit PublicKeyRegistered(msg.sender, publicKey, block.timestamp);
         }
@@ -78,9 +64,7 @@ contract PublicKeyRegistry {
      * @param users Array of addresses to look up
      * @return Array of public keys (empty bytes for unregistered users)
      */
-    function getPublicKeys(
-        address[] calldata users
-    ) external view returns (bytes[] memory) {
+    function getPublicKeys(address[] calldata users) external view returns (bytes[] memory) {
         bytes[] memory keys = new bytes[](users.length);
         for (uint256 i = 0; i < users.length; i++) {
             keys[i] = publicKeys[users[i]];

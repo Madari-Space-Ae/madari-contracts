@@ -39,11 +39,7 @@ contract BucketAccess {
         address indexed grantedBy
     );
 
-    event AccessRevoked(
-        bytes32 indexed bucketId,
-        address indexed user,
-        address indexed revokedBy
-    );
+    event AccessRevoked(bytes32 indexed bucketId, address indexed user, address indexed revokedBy);
 
     event BucketKeyUpdated(bytes32 indexed bucketId, address indexed user);
 
@@ -53,8 +49,8 @@ contract BucketAccess {
 
     modifier onlyBucketAdmin(bytes32 bucketId) {
         require(
-            bucketRegistry.getOwner(bucketId) == msg.sender ||
-                grants[bucketId][msg.sender].permission == Permission.ADMIN,
+            bucketRegistry.getOwner(bucketId) == msg.sender
+                || grants[bucketId][msg.sender].permission == Permission.ADMIN,
             "Not admin"
         );
         _;
@@ -74,15 +70,12 @@ contract BucketAccess {
     function initializeOwnerAccess(
         bytes32 bucketId,
         bytes calldata encryptedBucketKey
-    ) external bucketMustExist(bucketId) {
-        require(
-            bucketRegistry.getOwner(bucketId) == msg.sender,
-            "Not owner"
-        );
-        require(
-            grants[bucketId][msg.sender].permission == Permission.NONE,
-            "Already initialized"
-        );
+    )
+        external
+        bucketMustExist(bucketId)
+    {
+        require(bucketRegistry.getOwner(bucketId) == msg.sender, "Not owner");
+        require(grants[bucketId][msg.sender].permission == Permission.NONE, "Already initialized");
 
         grants[bucketId][msg.sender] = Grant({
             encryptedBucketKey: encryptedBucketKey,
@@ -107,13 +100,14 @@ contract BucketAccess {
         address user,
         bytes calldata encryptedBucketKey,
         Permission permission
-    ) external bucketMustExist(bucketId) onlyBucketAdmin(bucketId) {
+    )
+        external
+        bucketMustExist(bucketId)
+        onlyBucketAdmin(bucketId)
+    {
         require(permission != Permission.NONE, "Use revokeAccess");
         require(user != address(0), "Invalid user");
-        require(
-            grants[bucketId][user].permission == Permission.NONE,
-            "Already has access"
-        );
+        require(grants[bucketId][user].permission == Permission.NONE, "Already has access");
 
         grants[bucketId][user] = Grant({
             encryptedBucketKey: encryptedBucketKey,
@@ -134,15 +128,13 @@ contract BucketAccess {
     function revokeAccess(
         bytes32 bucketId,
         address user
-    ) external bucketMustExist(bucketId) onlyBucketAdmin(bucketId) {
-        require(
-            user != bucketRegistry.getOwner(bucketId),
-            "Cannot revoke owner"
-        );
-        require(
-            grants[bucketId][user].permission != Permission.NONE,
-            "No access to revoke"
-        );
+    )
+        external
+        bucketMustExist(bucketId)
+        onlyBucketAdmin(bucketId)
+    {
+        require(user != bucketRegistry.getOwner(bucketId), "Cannot revoke owner");
+        require(grants[bucketId][user].permission != Permission.NONE, "No access to revoke");
 
         delete grants[bucketId][user];
         // Note: grantedUsers array not cleaned up (gas optimization)
@@ -160,11 +152,12 @@ contract BucketAccess {
         bytes32 bucketId,
         address user,
         bytes calldata newEncryptedBucketKey
-    ) external bucketMustExist(bucketId) onlyBucketAdmin(bucketId) {
-        require(
-            grants[bucketId][user].permission != Permission.NONE,
-            "No access"
-        );
+    )
+        external
+        bucketMustExist(bucketId)
+        onlyBucketAdmin(bucketId)
+    {
+        require(grants[bucketId][user].permission != Permission.NONE, "No access");
 
         grants[bucketId][user].encryptedBucketKey = newEncryptedBucketKey;
 
@@ -173,56 +166,40 @@ contract BucketAccess {
 
     // ============ View Functions ============
 
-    function canAccess(
-        bytes32 bucketId,
-        address user
-    ) external view returns (bool) {
+    function canAccess(bytes32 bucketId, address user) external view returns (bool) {
         return grants[bucketId][user].permission != Permission.NONE;
     }
 
-    function canWrite(
-        bytes32 bucketId,
-        address user
-    ) external view returns (bool) {
+    function canWrite(bytes32 bucketId, address user) external view returns (bool) {
         Permission p = grants[bucketId][user].permission;
         return p == Permission.WRITE || p == Permission.ADMIN;
     }
 
-    function canAdmin(
-        bytes32 bucketId,
-        address user
-    ) external view returns (bool) {
+    function canAdmin(bytes32 bucketId, address user) external view returns (bool) {
         return grants[bucketId][user].permission == Permission.ADMIN;
     }
 
-    function getGrant(
-        bytes32 bucketId,
-        address user
-    ) external view returns (Grant memory) {
+    function getGrant(bytes32 bucketId, address user) external view returns (Grant memory) {
         return grants[bucketId][user];
     }
 
     function getEncryptedBucketKey(
         bytes32 bucketId,
         address user
-    ) external view returns (bytes memory) {
-        require(
-            grants[bucketId][user].permission != Permission.NONE,
-            "No access"
-        );
+    )
+        external
+        view
+        returns (bytes memory)
+    {
+        require(grants[bucketId][user].permission != Permission.NONE, "No access");
         return grants[bucketId][user].encryptedBucketKey;
     }
 
-    function getGrantedUsers(
-        bytes32 bucketId
-    ) external view returns (address[] memory) {
+    function getGrantedUsers(bytes32 bucketId) external view returns (address[] memory) {
         return grantedUsers[bucketId];
     }
 
-    function getPermission(
-        bytes32 bucketId,
-        address user
-    ) external view returns (Permission) {
+    function getPermission(bytes32 bucketId, address user) external view returns (Permission) {
         return grants[bucketId][user].permission;
     }
 }

@@ -47,10 +47,7 @@ contract ObjectRegistry {
     );
 
     event ObjectDeleted(
-        bytes32 indexed objectId,
-        bytes32 indexed bucketId,
-        string key,
-        address indexed deletedBy
+        bytes32 indexed objectId, bytes32 indexed bucketId, string key, address indexed deletedBy
     );
 
     event ObjectUpdated(
@@ -85,7 +82,11 @@ contract ObjectRegistry {
         string calldata key,
         bytes32 contentHash,
         uint256 size
-    ) external canWriteToBucket(bucketId) returns (bytes32 objectId) {
+    )
+        external
+        canWriteToBucket(bucketId)
+        returns (bytes32 objectId)
+    {
         require(bytes(key).length > 0, "Key required");
         require(bytes(key).length <= 256, "Key too long");
         require(size > 0, "Size must be > 0");
@@ -102,20 +103,12 @@ contract ObjectRegistry {
             obj.uploadedAt = block.timestamp;
             obj.uploadedBy = msg.sender;
 
-            emit ObjectUpdated(
-                existingObjectId,
-                bucketId,
-                contentHash,
-                size,
-                msg.sender
-            );
+            emit ObjectUpdated(existingObjectId, bucketId, contentHash, size, msg.sender);
             return existingObjectId;
         }
 
         // Create new object
-        objectId = keccak256(
-            abi.encodePacked(bucketId, key, block.timestamp, block.number)
-        );
+        objectId = keccak256(abi.encodePacked(bucketId, key, block.timestamp, block.number));
 
         objects[objectId] = Object({
             objectId: objectId,
@@ -132,14 +125,7 @@ contract ObjectRegistry {
         objectByKey[bucketId][key] = objectId;
         objectCount[bucketId]++;
 
-        emit ObjectCreated(
-            objectId,
-            bucketId,
-            key,
-            contentHash,
-            size,
-            msg.sender
-        );
+        emit ObjectCreated(objectId, bucketId, key, contentHash, size, msg.sender);
         return objectId;
     }
 
@@ -151,7 +137,10 @@ contract ObjectRegistry {
     function deleteObject(
         bytes32 bucketId,
         string calldata key
-    ) external canWriteToBucket(bucketId) {
+    )
+        external
+        canWriteToBucket(bucketId)
+    {
         bytes32 objectId = objectByKey[bucketId][key];
         require(objectId != bytes32(0), "Object not found");
 
@@ -173,15 +162,17 @@ contract ObjectRegistry {
     function getObjectByKey(
         bytes32 bucketId,
         string calldata key
-    ) external view returns (Object memory) {
+    )
+        external
+        view
+        returns (Object memory)
+    {
         bytes32 objectId = objectByKey[bucketId][key];
         require(objectId != bytes32(0), "Object not found");
         return objects[objectId];
     }
 
-    function listObjects(
-        bytes32 bucketId
-    ) external view returns (bytes32[] memory) {
+    function listObjects(bytes32 bucketId) external view returns (bytes32[] memory) {
         return bucketObjects[bucketId];
     }
 
@@ -189,10 +180,7 @@ contract ObjectRegistry {
         return objectCount[bucketId];
     }
 
-    function objectExists(
-        bytes32 bucketId,
-        string calldata key
-    ) external view returns (bool) {
+    function objectExists(bytes32 bucketId, string calldata key) external view returns (bool) {
         return objectByKey[bucketId][key] != bytes32(0);
     }
 

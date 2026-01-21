@@ -53,15 +53,9 @@ contract CustodyProofs {
         uint256 altitude
     );
 
-    event SatelliteAddressUpdated(
-        address indexed oldAddress,
-        address indexed newAddress
-    );
+    event SatelliteAddressUpdated(address indexed oldAddress, address indexed newAddress);
 
-    event OwnershipTransferred(
-        address indexed previousOwner,
-        address indexed newOwner
-    );
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     constructor(address _objectRegistry, address _satelliteAddress) {
         objectRegistry = ObjectRegistry(_objectRegistry);
@@ -94,7 +88,10 @@ contract CustodyProofs {
         uint256 altitude,
         bytes32 contentHashAttest,
         bytes calldata signature
-    ) external returns (bytes32 attestationId) {
+    )
+        external
+        returns (bytes32 attestationId)
+    {
         // Verify object exists
         ObjectRegistry.Object memory obj = objectRegistry.getObject(objectId);
         require(obj.exists, "Object not found");
@@ -118,9 +115,8 @@ contract CustodyProofs {
         // Require signature to be present (even if not verified in PoC)
         require(signature.length == 65, "Invalid signature length");
 
-        attestationId = keccak256(
-            abi.encodePacked(objectId, timestamp, block.number, totalAttestations)
-        );
+        attestationId =
+            keccak256(abi.encodePacked(objectId, timestamp, block.number, totalAttestations));
 
         attestations[attestationId] = Attestation({
             attestationId: attestationId,
@@ -140,13 +136,7 @@ contract CustodyProofs {
         totalAttestations++;
 
         emit AttestationSubmitted(
-            attestationId,
-            objectId,
-            obj.bucketId,
-            timestamp,
-            latitude,
-            longitude,
-            altitude
+            attestationId, objectId, obj.bucketId, timestamp, latitude, longitude, altitude
         );
 
         return attestationId;
@@ -174,33 +164,22 @@ contract CustodyProofs {
 
     // ============ View Functions ============
 
-    function getAttestation(
-        bytes32 attestationId
-    ) external view returns (Attestation memory) {
-        require(
-            attestations[attestationId].attestationId != bytes32(0),
-            "Attestation not found"
-        );
+    function getAttestation(bytes32 attestationId) external view returns (Attestation memory) {
+        require(attestations[attestationId].attestationId != bytes32(0), "Attestation not found");
         return attestations[attestationId];
     }
 
-    function getObjectAttestations(
-        bytes32 objectId
-    ) external view returns (bytes32[] memory) {
+    function getObjectAttestations(bytes32 objectId) external view returns (bytes32[] memory) {
         return objectAttestations[objectId];
     }
 
-    function getLatestAttestation(
-        bytes32 objectId
-    ) external view returns (Attestation memory) {
+    function getLatestAttestation(bytes32 objectId) external view returns (Attestation memory) {
         bytes32 attestationId = latestAttestation[objectId];
         require(attestationId != bytes32(0), "No attestations");
         return attestations[attestationId];
     }
 
-    function getAttestationCount(
-        bytes32 objectId
-    ) external view returns (uint256) {
+    function getAttestationCount(bytes32 objectId) external view returns (uint256) {
         return objectAttestations[objectId].length;
     }
 
@@ -210,10 +189,7 @@ contract CustodyProofs {
      * @param contentHash The content hash to compare
      * @return True if content hash matches the latest attestation
      */
-    function verifyContentHash(
-        bytes32 objectId,
-        bytes32 contentHash
-    ) external view returns (bool) {
+    function verifyContentHash(bytes32 objectId, bytes32 contentHash) external view returns (bool) {
         bytes32 attestationId = latestAttestation[objectId];
         if (attestationId == bytes32(0)) return false;
         return attestations[attestationId].contentHashAttest == contentHash;
@@ -237,7 +213,11 @@ contract CustodyProofs {
     function recoverSigner(
         bytes32 messageHash,
         bytes memory signature
-    ) public pure returns (address) {
+    )
+        public
+        pure
+        returns (address)
+    {
         require(signature.length == 65, "Invalid signature length");
 
         bytes32 r;
@@ -256,9 +236,8 @@ contract CustodyProofs {
 
         require(v == 27 || v == 28, "Invalid signature v value");
 
-        bytes32 prefixedHash = keccak256(
-            abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash)
-        );
+        bytes32 prefixedHash =
+            keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash));
 
         return ecrecover(prefixedHash, v, r, s);
     }
