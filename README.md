@@ -8,10 +8,19 @@ Built with [Foundry](https://book.getfoundry.sh/).
 
 Madari provides verifiable document storage on satellites. These contracts run on a custom **Avalanche L1** and handle:
 
-- **Bucket management** - S3-style containers for objects
-- **Access control** - Encrypted key distribution for sharing
-- **Object registry** - Track files stored on satellite
-- **Custody proofs** - Record satellite attestations on-chain
+**Key Value Proposition:** Without blockchain, customers must trust Madari's claim that data was stored in space. With blockchain, anyone can independently verify custody using cryptographic proofs signed by the satellite's onboard private key.
+
+**Detailed Design:** See [`docs/smart-contract-design.md`](docs/smart-contract-design.md) for comprehensive documentation on architecture, encryption model, access control flows, and security considerations.
+
+### What These Contracts Enable
+
+| Capability | Contract | Description |
+|------------|----------|-------------|
+| **Bucket Management** | `BucketRegistry` | S3-style containers for organizing objects |
+| **Access Control** | `BucketAccess` | Encrypted key distribution for trustless sharing |
+| **Object Tracking** | `ObjectRegistry` | On-chain registry of files stored on satellite |
+| **Custody Proofs** | `CustodyProofs` | Immutable record of satellite attestations |
+| **Key Exchange** | `PublicKeyRegistry` | User public keys for ECIES encryption |
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -69,10 +78,19 @@ madari-contracts/
 ├── test/                     # Foundry tests (Solidity)
 │   └── BucketRegistry.t.sol  # Example test
 ├── script/                   # Deployment scripts
+├── docs/                     # Documentation
+│   └── smart-contract-design.md  # Comprehensive design doc
 ├── lib/                      # Dependencies (forge-std)
 ├── foundry.toml              # Foundry configuration
 └── README.md                 # This file
 ```
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [`docs/smart-contract-design.md`](docs/smart-contract-design.md) | Comprehensive design document covering architecture, encryption model, access control flows, custody proofs, and security considerations |
+| [README.md](README.md) | Quick start guide and contract overview (this file) |
 
 ## Quick Start
 
