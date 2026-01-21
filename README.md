@@ -174,30 +174,48 @@ export PRIVATE_KEY=your_private_key
 forge script script/Deploy.s.sol --rpc-url $AVALANCHE_FUJI_RPC_URL --private-key $PRIVATE_KEY --broadcast
 ```
 
-### Madari L1 (AvaCloud)
+### Madari L1 Testnet (AvaCloud)
 
 ```bash
-# Set environment variables
-export MADARI_L1_RPC_URL=https://your-avacloud-rpc-url
+# Set environment variables (see .env.example)
+export MADARI_TESTNET_RPC_URL=https://subnets.avax.network/madari/testnet/rpc
 export PRIVATE_KEY=your_private_key
 
 # Deploy
-forge script script/Deploy.s.sol --rpc-url $MADARI_L1_RPC_URL --private-key $PRIVATE_KEY --broadcast
+forge script script/Deploy.s.sol --rpc-url $MADARI_TESTNET_RPC_URL --private-key $PRIVATE_KEY --broadcast
+
+# Verify on explorer
+# Explorer: https://explorer-test.avax.network/madari
 ```
+
+## Network Configuration
+
+### Madari L1 Testnet
+
+| Field | Value |
+|-------|-------|
+| **Network Name** | Madari L1 Testnet |
+| **Public RPC** | `https://subnets.avax.network/madari/testnet/rpc` |
+| **Explorer** | https://explorer-test.avax.network/madari |
+| **Chain ID** | See AvaCloud console |
+
+> **Note:** Developer RPC endpoints with WebSocket support are available via AvaCloud console (require authentication token).
 
 ## Environment Variables
 
-Create a `.env` file (gitignored):
+Create a `.env` file (gitignored) - see `.env.example`:
 
 ```bash
-# RPC URLs
+# Madari L1 Testnet
+MADARI_TESTNET_RPC_URL=https://subnets.avax.network/madari/testnet/rpc
+
+# Avalanche Fuji (for testing)
 AVALANCHE_FUJI_RPC_URL=https://api.avax-test.network/ext/bc/C/rpc
-MADARI_L1_RPC_URL=https://your-avacloud-rpc-url
 
 # Deployment
 PRIVATE_KEY=your_deployer_private_key
 
-# Verification
+# Verification (optional)
 SNOWTRACE_API_KEY=your_snowtrace_api_key
 ```
 
