@@ -195,9 +195,9 @@ forge script script/Deploy.s.sol --rpc-url $MADARI_TESTNET_RPC_URL --private-key
 | Field | Value |
 |-------|-------|
 | **Network Name** | Madari L1 Testnet |
+| **Chain ID** | `53319` |
 | **Public RPC** | `https://subnets.avax.network/madari/testnet/rpc` |
 | **Explorer** | https://explorer-test.avax.network/madari |
-| **Chain ID** | See AvaCloud console |
 
 > **Note:** Developer RPC endpoints with WebSocket support are available via AvaCloud console (require authentication token).
 
